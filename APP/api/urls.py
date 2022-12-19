@@ -5,7 +5,7 @@ from APP.api.views import (WatchListAV, WatchDetailAV,StreamPlatformAV,StreamPla
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register('stream',StreamPlatformVS.as_view(),basename='streamplatform')
+router.register('stream',StreamPlatformVS,basename='streamplatform')
 
 urlpatterns = [
     path('list/', WatchListAV.as_view(),name='movies_list'),
