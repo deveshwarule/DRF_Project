@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 
 from APP.models import WatchList, StreamPlatform, Review
 from APP.api.serializers import WatchListSerializer,StreamPlatformSerializer, ReviewSerializer
-from APP.api.permissions import AdminOrReadOnly
+from APP.api.permissions import AdminOrReadOnly, ReviewUserOrReadOnly
 
 class StreamPlatformVS(viewsets.ModelViewSet):
     queryset = StreamPlatform.objects.all()
@@ -29,16 +29,6 @@ class StreamPlatformVS(viewsets.ModelViewSet):
 #         watchlist = get_object_or_404(queryset, pk=pk)
 #         serializer = StreamPlatformSerializer(watchlist)
 #         return Response(serializer.data)
-
-class ReviewList(generics.ListAPIView):
-    #queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get_queryset(self):
-        pk = self.kwargs['pk']
-        return Review.objects.filter(watchlist=pk)
-    
 class ReviewCreate(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     
@@ -56,11 +46,20 @@ class ReviewCreate(generics.CreateAPIView):
             raise ValidationError("You already reviewed his movie")
         
         serializer.save(watchlist=movie,review_user=user)
+
+class ReviewList(generics.ListAPIView):
+    #queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return Review.objects.filter(watchlist=pk)
     
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [AdminOrReadOnly]
+    permission_classes = [ReviewUserOrReadOnly]
 
 class StreamPlatformAV(APIView):
     def get(self, request):
